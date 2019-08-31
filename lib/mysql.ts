@@ -17,6 +17,7 @@ interface ExecOption extends greendb.IEngineOptions {
 }
 
 interface Logger {
+    debug(message?: any, ...optionalParams: any[]): void;
     info(message?: any, ...optionalParams: any[]): void;
     error(message?: any, ...optionalParams: any[]): void;
 }
@@ -38,6 +39,7 @@ export class MysqlEngine implements greendb.IEngine {
         });
     }
     protected extendsConn(conn: mysql.PoolConnection) {
+        let that = this
         conn.beginTransaction = fromCallback(conn.beginTransaction);
         conn.commit = fromCallback(conn.commit);
         conn.rollback = fromCallback(conn.rollback);
@@ -46,10 +48,10 @@ export class MysqlEngine implements greendb.IEngine {
             return new Promise((resolve, reject) => {
                 this.query(sql, args, function(err, rows) {
                     if (err) {
-                        if (!ignore && this.visiable != false) this.log.error(sql, args || "", err);
+                        if (!ignore && that.visiable != false) that.log.error(sql, args || "", err);
                         reject(err);
                     } else {
-                        if (!ignore && this.visiable === true) this.log.debug(sql, args || "");
+                        if (!ignore && that.visiable === true) that.log.debug(sql, args || "");
                         resolve(rows);
                     }
                 });

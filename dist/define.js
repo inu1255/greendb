@@ -66,14 +66,14 @@ class Field {
     toString() {
         let s = use(this._name) + " " + this._type;
         let canDef = !/text|json/.test(this._type);
+        if (this._charset)
+            s += " CHARACTER SET " + this._charset;
         if (!this._null)
             s += " NOT NULL";
         else if (canDef && this._default == null)
             s += " DEFAULT NULL";
         if (this._inc)
             s += " AUTO_INCREMENT";
-        if (this._charset)
-            s += " CHARACTER SET " + this._charset;
         if (canDef && this._default != null)
             s += ` DEFAULT ${val(this._default)}`;
         if (this._comment)
@@ -678,9 +678,11 @@ class Table {
                 }
                 if (f0) {
                     // 有同一个字段
-                    if (!f1.equal(f0))
+                    if (!f1.equal(f0)) {
                         // 如果字段发生改变
                         sqls.push(`alter table ${use(this._name)} modify column ${f1.toString()};`);
+                        console.log(f1.toString());
+                    }
                 }
                 else {
                     // 多了个字段

@@ -13,6 +13,7 @@ interface ExecOption extends greendb.IEngineOptions {
     ignore?: boolean;
 }
 interface Logger {
+    debug(message?: any, ...optionalParams: any[]): void;
     info(message?: any, ...optionalParams: any[]): void;
     error(message?: any, ...optionalParams: any[]): void;
 }

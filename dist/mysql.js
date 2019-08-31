@@ -17,6 +17,7 @@ class MysqlEngine {
         });
     }
     extendsConn(conn) {
+        let that = this;
         conn.beginTransaction = universalify_1.fromCallback(conn.beginTransaction);
         conn.commit = universalify_1.fromCallback(conn.commit);
         conn.rollback = universalify_1.fromCallback(conn.rollback);
@@ -25,13 +26,13 @@ class MysqlEngine {
             return new Promise((resolve, reject) => {
                 this.query(sql, args, function (err, rows) {
                     if (err) {
-                        if (!ignore && this.visiable != false)
-                            this.log.error(sql, args || "", err);
+                        if (!ignore && that.visiable != false)
+                            that.log.error(sql, args || "", err);
                         reject(err);
                     }
                     else {
-                        if (!ignore && this.visiable === true)
-                            this.log.debug(sql, args || "");
+                        if (!ignore && that.visiable === true)
+                            that.log.debug(sql, args || "");
                         resolve(rows);
                     }
                 });

@@ -89,10 +89,10 @@ export class Field {
     toString() {
         let s = use(this._name) + " " + this._type;
         let canDef = !/text|json/.test(this._type)
+        if (this._charset) s += " CHARACTER SET " + this._charset;
         if (!this._null) s += " NOT NULL";
         else if (canDef && this._default == null) s += " DEFAULT NULL";
         if (this._inc) s += " AUTO_INCREMENT";
-        if (this._charset) s += " CHARACTER SET " + this._charset;
         if (canDef && this._default != null) s += ` DEFAULT ${val(this._default)}`;
         if (this._comment) s += ` COMMENT '${this._comment.replace(/'/g, "\\'")}'`;
         return s;

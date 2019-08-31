@@ -678,11 +678,9 @@ class Table {
                 }
                 if (f0) {
                     // 有同一个字段
-                    if (!f1.equal(f0)) {
+                    if (!f1.equal(f0))
                         // 如果字段发生改变
                         sqls.push(`alter table ${use(this._name)} modify column ${f1.toString()};`);
-                        console.log(f1.toString());
-                    }
                 }
                 else {
                     // 多了个字段

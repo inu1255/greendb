@@ -282,7 +282,7 @@ export class SelectSql<T = any> extends SqlWhere<T> {
         this._first = true;
         return this;
     }
-    page(): Promise<Paged<any>> {
+    page(): Promise<Paged<T>> {
         this._page = true;
         return this as any;
     }
@@ -556,8 +556,8 @@ export function createBuilder<T extends IEngine>(e: T) {
             return new Raw(sql, args);
         },
         where,
-        select(table: string, keys?: string | string[]) {
-            return new SelectSql(table, keys).engine(e);
+        select<T=any>(table: string, keys?: string | string[]) {
+            return new SelectSql<T>(table, keys).engine(e);
         },
         insert(table: string, data: any) {
             return new InsertSql(table, data).engine(e);

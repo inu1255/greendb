@@ -134,7 +134,7 @@ export declare class SelectSql<T = any> extends SqlWhere<T> {
     orderBy(key: string): this;
     limit(offset: number, size: number): this;
     first(): this;
-    page(): Promise<Paged<any>>;
+    page(): Promise<Paged<T>>;
     pms(): Promise<any>;
     exclude(keys: string[]): PromiseLike<any>;
 }
@@ -183,7 +183,7 @@ export declare function instanceOfSql(sql: any): sql is ISql;
 export declare function createBuilder<T extends IEngine>(e: T): T & {
     r(sql: string, args?: any): Raw;
     where: typeof where;
-    select(table: string, keys?: string | string[]): SelectSql<any>;
+    select<T_1 = any>(table: string, keys?: string | string[]): SelectSql<T_1>;
     insert(table: string, data: any): InsertSql<any>;
     update(table: string, data: any): UpdateSql<any>;
     delete(table: string): DeleteSql<any>;

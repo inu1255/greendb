@@ -298,9 +298,6 @@ class Constraint {
 }
 exports.Constraint = Constraint;
 class Table {
-    get name() {
-        return this._name;
-    }
     /**
      * @param {string} name
      * @param {Array<Field|Constraint>} fields
@@ -311,6 +308,9 @@ class Table {
         for (let field of this._fields) {
             field.table(name);
         }
+    }
+    get name() {
+        return this._name;
     }
     comment(comment) {
         this._comment = comment;
@@ -448,6 +448,9 @@ class Table {
             "method": "post",
             "params": this.toParams(x => ignores.indexOf(x._name) < 0),
             "grant": info.has_create_id ? "{U}" : "{U}.lvl<1",
+            "error": {
+                "404": "目标不存在或无权限"
+            },
             "ret": {
                 "no": 200,
                 "data": this.toMock(),
@@ -455,17 +458,18 @@ class Table {
         };
         var data = [
             `export async function ${utils.camelCase(name)}(req: ExpressRequest, res: ExpressResponse) {`,
-            `    // gparam "../../api/${dir}/${name}.json" --ts`,
-            `    let body = req.body`,
+            `    let body: apar.${utils.CamelCase(dir) + utils.CamelCase(name)}Body = req.body`,
             `    let user = req.session.user;`,
             `    if (body.id) {`,
-            `        let data: db.${utils.CamelCase(this._name)} = Object.assign({`,
-            info.has_update_at ? `            update_at: Date.now(),` : null,
-            `        }, body)`,
-            `        let sql = db.update('${this._name}', body).where({ id: body.id })`,
+            `        let sql = db.select<db.${utils.CamelCase(this._name)}>('${this._name}').where({ id: body.id })`,
             info.has_create_id ? `        if (user.lvl > 0) sql.where({create_id: user.id})` : null,
-            `        let pac = await sql`,
-            `        return { n: pac.affectedRows }`,
+            `        let old = await sql.first();`,
+            `        if(!old) return 404;`,
+            `        let data = utils.clearKeys(body, old)`,
+            `        if (utils.isEmpty(body)) return data`,
+            info.has_update_at ? `        data.update_at = Date.now();` : null,
+            `        await db.update('${this._name}', data).where({ id: old.id })`,
+            `        return data`,
             `    }`,
             `    let data: db.${utils.CamelCase(this._name)} = Object.assign({`,
             info.has_create_id ? `        create_id: user.id,` : null,
@@ -510,8 +514,7 @@ class Table {
         };
         var data = [
             `export async function ${utils.camelCase(name)}(req: ExpressRequest, res: ExpressResponse) {`,
-            `    // gparam "../../api/${dir}/${name}.json" --ts`,
-            `    let body = req.body`,
+            `    let body: apar.${utils.CamelCase(dir) + utils.CamelCase(name)}Body = req.body`,
             `    let user = req.session.user;`,
             `    let sql = db.delete('${this._name}').where({ id: body.id })`,
             info.has_create_id ? `    if (user.lvl > 0) sql.where({create_id: user.id})` : null,
@@ -595,8 +598,7 @@ class Table {
         }
         var data = [
             `export async function ${utils.camelCase(name)}(req: ExpressRequest, res: ExpressResponse) {`,
-            `    // gparam "../../api/${dir}/${name}.json" --ts`,
-            `    let body = req.body`,
+            `    let body: apar.${utils.CamelCase(dir) + utils.CamelCase(name)}Body = req.body`,
             `    let user = req.session.user;`,
             `    let sql = db.select('${this._name}','${fieldNames}');`,
             ...querys,
@@ -792,8 +794,11 @@ class TableBuilder {
     init(db) {
         return db.execSQL(`show tables`).then(rows => {
             return Promise.all(rows.map(x => {
-                let name = Object.values(x)[0];
-                console.log(name);
+                let name;
+                for (let k in rows) {
+                    name = rows[k][0];
+                    break;
+                }
                 this.tables[name] = null;
                 return db.execSQL(`show create table ${use(name)}`, [], { ignore: true }).then(rows => {
                     this.tables[name] = new Table().parse(rows[0]["Create Table"]);

@@ -187,7 +187,6 @@ let cmds = {
                 `import { appLogger } from "../common/log";`,
                 `import * as utils from "../common/utils";`,
                 `import * as cofs from "fs-extra";`,
-                `import { Request, Response } from "express-serve-static-core";`,
             ].join('\n') + '\n';
         }
         let edit = false;

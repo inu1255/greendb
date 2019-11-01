@@ -122,6 +122,9 @@ export declare class Table {
                 [key: string]: GreenParam;
             };
             "grant": string;
+            "error": {
+                "404": string;
+            };
             "ret": {
                 "no": number;
                 "data": {

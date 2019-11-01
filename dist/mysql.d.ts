@@ -39,7 +39,7 @@ export declare function createPool(config: string | mysql.PoolConfig, log?: Logg
     where: (key: string | {
         [key: string]: any;
     }, value?: any) => import("./sqlbuilder").Where;
-    select(table: string, keys?: string | string[]): greendb.SelectSql<any>;
+    select<T = any>(table: string, keys?: string | string[]): greendb.SelectSql<T>;
     insert(table: string, data: any): import("./sqlbuilder").InsertSql<any>;
     update(table: string, data: any): import("./sqlbuilder").UpdateSql<any>;
     delete(table: string): import("./sqlbuilder").DeleteSql<any>;

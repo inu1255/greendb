@@ -773,7 +773,7 @@ class TableBuilder {
         let tables = [];
         for (let k in this.tables) {
             let v = this.tables[k];
-            tables.push(v.merge(db).then(sqls => ({ name: k, sqls })));
+            tables.push(v.merge(db, run, true).then(sqls => ({ name: k, sqls })));
         }
         return Promise.all(tables).then(tables => {
             let sqls = [];

@@ -1,22 +1,37 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const sqlbuilder_1 = require("./sqlbuilder");
-exports.createBuilder = sqlbuilder_1.createBuilder;
-exports.SelectSql = sqlbuilder_1.SelectSql;
-exports.instanceOfSql = sqlbuilder_1.instanceOfSql;
-const define_1 = require("./define");
-exports.TableBuilder = define_1.TableBuilder;
-exports.Table = define_1.Table;
-exports.Constraint = define_1.Constraint;
-exports.Field = define_1.Field;
-const utils_1 = require("./utils");
-exports.arr = utils_1.arr;
-exports.val = utils_1.val;
-exports.CamelCase = utils_1.CamelCase;
-exports.camelCase = utils_1.camelCase;
-exports.randomNumber = utils_1.randomNumber;
-exports.randomString = utils_1.randomString;
-exports.findNext = utils_1.findNext;
-const mysql_1 = require("./mysql");
-exports.createPool = mysql_1.createPool;
-exports.MysqlEngine = mysql_1.MysqlEngine;
+var core_1 = require("./core");
+exports.arr = core_1.arr;
+exports.val = core_1.val;
+exports.Where = core_1.Where;
+exports.Engine = core_1.Engine;
+exports.PoolEngine = core_1.PoolEngine;
+exports.ConnEngine = core_1.ConnEngine;
+exports.SelectSql = core_1.SelectSql;
+exports.InsertOrUpdate = core_1.InsertOrUpdate;
+exports.instanceOfSql = core_1.instanceOfSql;
+exports.InsertSql = core_1.InsertSql;
+var schema_1 = require("./schema");
+exports.SchemaBuilder = schema_1.SchemaBuilder;
+exports.Table = schema_1.Table;
+exports.Field = schema_1.Field;
+exports.Constraint = schema_1.Constraint;
+exports.TableBuilder = schema_1.TableBuilder;
+function createPool(url, config) {
+    if (!config)
+        config = url;
+    var s = url.toLowerCase();
+    var mod;
+    if (s.startsWith("mysql")) {
+        mod = require("./engines/mysql");
+    }
+    else if (s.startsWith("sqlite")) {
+        mod = require("./engines/sqlite");
+    }
+    else if (s.startsWith("postgresql")) {
+        mod = require("./engines/postgresql");
+    }
+    if (mod)
+        return new mod(config);
+}
+exports.createPool = createPool;

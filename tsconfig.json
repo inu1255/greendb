@@ -1,9 +1,11 @@
 {
-  "compilerOptions": {
-    "target": "es2015",
-    "module": "commonjs",
-    "declaration": true,
-    "removeComments": false,
-    "outDir": "./dist"
-  }
+	"compilerOptions": {
+		"target": "ES5",
+		"module": "commonjs",
+		"declaration": true,
+		"removeComments": false,
+		"outDir": "./dist",
+		"sourceMap": true
+	},
+	"include": ["lib"]
 }

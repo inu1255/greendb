@@ -332,13 +332,13 @@ var SchemaBuilder = /** @class */ (function () {
         configurable: true
     });
     SchemaBuilder.prototype.table = function (name, fields) {
-        return (this._tables[name] = new Table(name, fields));
+        return (this._tables[name] = new TableBuilder(name, fields));
     };
     SchemaBuilder.prototype.mapTable = function (fn) {
         var out = [];
         for (var k in this._tables) {
             var v = this._tables[k];
-            out.push(fn(v));
+            out.push(fn(v.build()));
         }
         return out;
     };
@@ -354,7 +354,7 @@ var SchemaBuilder = /** @class */ (function () {
             var a = this._tables[k];
             var b = oldMap[k];
             delete oldMap[k];
-            pmss.push(fn(a, b));
+            pmss.push(fn(a.build(), b));
         }
         for (var k in oldMap) {
             var v = oldMap[k];
@@ -374,11 +374,6 @@ var SchemaBuilder = /** @class */ (function () {
                     return db.execSQL("drop table " + db.quotes(oldTable.name));
             });
         });
-    };
-    SchemaBuilder.prototype.add = function (tables) {
-        var _this = this;
-        tables.forEach(function (x) { return (_this._tables[x.name] = x); });
-        return this;
     };
     //#region 字段
     SchemaBuilder.prototype.field = function (name, type) {

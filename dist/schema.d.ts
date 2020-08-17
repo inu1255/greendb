@@ -119,11 +119,10 @@ export declare class SchemaBuilder {
     private _tables;
     constructor();
     readonly tables: Table[];
-    table(name: string, fields?: Array<FieldBuilder | ConstraintBuilder>): Table;
+    table(name: string, fields?: Array<FieldBuilder | ConstraintBuilder>): TableBuilder;
     mapTable<T>(fn: (table: Table) => T): T[];
     migrationFrom(old: SchemaBuilder | Table[], fn: (newTable: Table, oldTable: Table) => Promise<any>): Promise<any[]>;
     sync(db: IEngine, dropTable?: boolean): Promise<any[]>;
-    add(tables: Table[]): this;
     private field;
     varchar(name: string, len: number): FieldBuilder;
     text(name: string): FieldBuilder;

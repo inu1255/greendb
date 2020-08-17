@@ -359,7 +359,7 @@ export class TableBuilder {
 }
 
 export class SchemaBuilder {
-	private _tables: {[key: string]: Table};
+	private _tables: {[key: string]: TableBuilder};
 	constructor() {
 		this._tables = {};
 	}
@@ -367,13 +367,13 @@ export class SchemaBuilder {
 		return this.mapTable((x) => x);
 	}
 	table(name: string, fields?: Array<FieldBuilder | ConstraintBuilder>) {
-		return (this._tables[name] = new Table(name, fields));
+		return (this._tables[name] = new TableBuilder(name, fields));
 	}
 	mapTable<T>(fn: (table: Table) => T): T[] {
 		let out: T[] = [];
 		for (let k in this._tables) {
 			let v = this._tables[k];
-			out.push(fn(v));
+			out.push(fn(v.build()));
 		}
 		return out;
 	}
@@ -388,7 +388,7 @@ export class SchemaBuilder {
 			let a = this._tables[k];
 			let b = oldMap[k];
 			delete oldMap[k];
-			pmss.push(fn(a, b));
+			pmss.push(fn(a.build(), b));
 		}
 		for (let k in oldMap) {
 			let v = oldMap[k];
@@ -404,10 +404,6 @@ export class SchemaBuilder {
 				if (oldTable && dropTable) return db.execSQL(`drop table ${db.quotes(oldTable.name)}`);
 			})
 		);
-	}
-	add(tables: Table[]) {
-		tables.forEach((x) => (this._tables[x.name] = x));
-		return this;
 	}
 	//#region 字段
 	private field(name: string, type: string) {

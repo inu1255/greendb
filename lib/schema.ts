@@ -366,7 +366,10 @@ export class SchemaBuilder {
 	get tables() {
 		return this.mapTable((x) => x);
 	}
+	/** get or define table */
 	table(name: string, fields?: Array<FieldBuilder | ConstraintBuilder>) {
+		if (!fields) return this._tables[name];
+		if (this._tables[name]) throw new Error(`duplicate table ${name}`);
 		return (this._tables[name] = new TableBuilder(name, fields));
 	}
 	mapTable<T>(fn: (table: Table) => T): T[] {

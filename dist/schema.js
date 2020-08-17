@@ -331,7 +331,12 @@ var SchemaBuilder = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
+    /** get or define table */
     SchemaBuilder.prototype.table = function (name, fields) {
+        if (!fields)
+            return this._tables[name];
+        if (this._tables[name])
+            throw new Error("duplicate table " + name);
         return (this._tables[name] = new TableBuilder(name, fields));
     };
     SchemaBuilder.prototype.mapTable = function (fn) {

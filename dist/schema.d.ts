@@ -119,6 +119,7 @@ export declare class SchemaBuilder {
     private _tables;
     constructor();
     readonly tables: Table[];
+    /** get or define table */
     table(name: string, fields?: Array<FieldBuilder | ConstraintBuilder>): TableBuilder;
     mapTable<T>(fn: (table: Table) => T): T[];
     migrationFrom(old: SchemaBuilder | Table[], fn: (newTable: Table, oldTable: Table) => Promise<any>): Promise<any[]>;

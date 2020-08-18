@@ -2,6 +2,7 @@ import {Pool, PoolConfig, PoolClient} from "pg";
 import {ConnEngine, PoolEngine, IEngine, ISql, InsertSql, SelectSql, InsertOrUpdate, Table} from "..";
 import {TableBuilder, Field} from "../schema";
 import {table} from "console";
+import {parse} from "url";
 
 interface PgTable {
 	oid: number;
@@ -329,8 +330,18 @@ const PgConnEngine = EngineOverride(
 export = EngineOverride(
 	class PgEngine extends PoolEngine {
 		private pool: Pool;
-		constructor(config: PoolConfig) {
+		constructor(config: PoolConfig | string) {
 			super();
+			if (typeof config === "string") {
+				let u = parse(config);
+				let [user, password] = u.auth.split(":");
+				config = {
+					host: u.host,
+					user,
+					password,
+					database: u.path.slice(1),
+				};
+			}
 			this.pool = new Pool(config);
 		}
 		protected getConnEngine() {

@@ -18,7 +18,7 @@ declare const _default: {
         execSQL(sqls: string | ISql | (string | ISql)[], args?: any[], ctx?: import("..").ExecSqlOptions): Promise<any>;
     };
 } & {
-    new (config: PoolConfig): {
+    new (config: string | PoolConfig): {
         pool: Pool;
         getConnEngine(): {
             runSql(s: ISql): Promise<any>;

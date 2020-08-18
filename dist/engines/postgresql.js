@@ -22,6 +22,7 @@ var __spreadArrays = (this && this.__spreadArrays) || function () {
 var pg_1 = require("pg");
 var __1 = require("..");
 var schema_1 = require("../schema");
+var url_1 = require("url");
 var PgSelectSql = /** @class */ (function (_super) {
     __extends(PgSelectSql, _super);
     function PgSelectSql() {
@@ -362,6 +363,16 @@ module.exports = EngineOverride(/** @class */ (function (_super) {
     __extends(PgEngine, _super);
     function PgEngine(config) {
         var _this = _super.call(this) || this;
+        if (typeof config === "string") {
+            var u = url_1.parse(config);
+            var _a = u.auth.split(":"), user = _a[0], password = _a[1];
+            config = {
+                host: u.host,
+                user: user,
+                password: password,
+                database: u.path.slice(1),
+            };
+        }
         _this.pool = new pg_1.Pool(config);
         return _this;
     }

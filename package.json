@@ -1,14 +1,13 @@
 {
 	"name": "greendb",
-	"version": "2.0.4",
+	"version": "2.0.6",
 	"description": "create npm package with typescript",
 	"main": "dist/index.js",
 	"scripts": {
 		"start": "tsc --watch",
 		"build": "tsc -b tsconfig.build.json",
 		"test": "mocha --no-timeouts --reporter spec",
-		"cover": "istanbul cover node_modules/mocha/bin/_mocha test/*.js - - -R spec",
-		"publish": "npm publish --registry https://registry.npmjs.org"
+		"cover": "istanbul cover node_modules/mocha/bin/_mocha test/*.js - - -R spec"
 	},
 	"directories": {
 		"lib": "lib",

@@ -367,7 +367,7 @@ module.exports = EngineOverride(/** @class */ (function (_super) {
             var u = url_1.parse(config);
             var _a = u.auth.split(":"), user = _a[0], password = _a[1];
             config = {
-                host: u.host,
+                host: u.hostname,
                 user: user,
                 password: password,
                 database: u.path.slice(1),

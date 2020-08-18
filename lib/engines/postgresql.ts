@@ -336,7 +336,7 @@ export = EngineOverride(
 				let u = parse(config);
 				let [user, password] = u.auth.split(":");
 				config = {
-					host: u.host,
+					host: u.hostname,
 					user,
 					password,
 					database: u.path.slice(1),

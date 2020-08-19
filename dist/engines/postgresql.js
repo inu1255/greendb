@@ -89,12 +89,11 @@ function EngineOverride(Base) {
                 .then(function (rows) { return rows[0].db; })
                 .then(function (x) {
                 db = x;
-                return _this.execSQL("select oid from pg_namespace where nspowner=(select datdba from pg_database where datname=?) and nspname=?", [db, nspname]).then(function (rows) { return rows[0].oid; });
+                return _this.execSQL("select oid from pg_namespace where nspname=?", [nspname]).then(function (rows) { return rows[0].oid; });
             })
                 .then(function (oid) {
                 return _this.execSQL("select oid,relname from pg_class where relkind='r' and relpersistence='p' and relnamespace=?", [oid]).then(function (tables) { return ({
                     db: db,
-                    oid: oid,
                     tables: tables,
                 }); });
             })

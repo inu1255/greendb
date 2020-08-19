@@ -207,11 +207,16 @@ class SqlWhere<T> extends Wherable(Sql) implements Promise<T> {
 export class InsertSql<T = any> extends Sql implements Promise<T> {
 	protected _id: boolean;
 	protected _ignore: string;
+	private _data: any;
 	constructor(table: string, data: any) {
 		super(table);
 		this._args = [];
 		this._ignore = "";
-		this.load(wrapInsert(data));
+		this._data = data;
+	}
+	engine(e: IEngine) {
+		this.load(wrapInsert(this._data, (x) => e.quotes(x)));
+		return super.engine(e);
 	}
 	get sql() {
 		return `insert ${this._ignore}into ${this.quotes(this._table)} ${this._sql}`;
@@ -313,9 +318,14 @@ export class SelectSql<T = any> extends SqlWhere<T> {
 }
 
 export class UpdateSql<T = any> extends SqlWhere<T> {
+	private _data: any;
 	constructor(table: string, data: any) {
 		super(table);
-		this.load(wrapSet(data));
+		this._data = data;
+	}
+	engine(e: IEngine) {
+		this.load(wrapSet(this._data, (x) => e.quotes(x)));
+		return super.engine(e);
 	}
 	get sql(): string {
 		return `update ${this.quotes(this._table)} set ${this._sql}${this._where.toWhere()}`;
@@ -396,7 +406,7 @@ export class InsertOrUpdate<T = any> extends Wherable(Tablable(Runnable(Base))) 
 		return new SelectSql(this._table).where(this._where).first().engine(this._e);
 	}
 	wrapSet() {
-		return wrapSet(this._updateData);
+		return wrapSet(this._updateData, (x) => this._e.quotes(x));
 	}
 	hasWhere() {
 		return !this._where.isEmpty();
@@ -411,7 +421,7 @@ export class InsertOrUpdate<T = any> extends Wherable(Tablable(Runnable(Base))) 
  * id=?,name=?
  * @param data
  */
-function wrapSet(data) {
+function wrapSet(data: any, quotes: Function) {
 	if (data instanceof Raw) return data;
 	let keys = [];
 	let args = [];
@@ -419,10 +429,10 @@ function wrapSet(data) {
 		let v = data[k];
 		if (v === undefined) continue;
 		if (v instanceof Raw) {
-			keys.push(k + "=(" + v.sql + ")");
+			keys.push(quotes(k) + "=(" + v.sql + ")");
 			args.push.apply(args, v.args);
 		} else {
-			keys.push(k + "=?");
+			keys.push(quotes(k) + "=?");
 			args.push(val(v));
 		}
 	}
@@ -485,12 +495,12 @@ function warpValues(data: object, keys?: string[]) {
  * (id,name) values(?,?),(?,?)
  * @param data
  */
-function wrapInsert(data) {
+function wrapInsert(data, quotes: Function) {
 	data = arr(data);
 	if (data.length > 0) {
 		let keys = [];
 		let raw = warpValues(data[0], keys);
-		let dst = new Raw(`(${keys.join(",")}) values${raw.sql}`, raw.args);
+		let dst = new Raw(`(${keys.map(quotes as any).join(",")}) values${raw.sql}`, raw.args);
 		for (let i = 1; i < data.length; i++) {
 			let item = data[i];
 			raw = warpValues(item, keys);
@@ -551,7 +561,7 @@ export abstract class Engine implements IEngine {
 	}
 	//#region override 通过重载以下进行Engine定制
 	quotes(key: string) {
-		return key.replace(/(?<!["'\w])\w+(?!["'\w])/g, (x) => `"${x}"`);
+		return key.replace(/(?<!["'\w])\w+(?!["'\w])/, (x) => `"${x}"`);
 	}
 	runSql(s: Sql): Promise<Paged<any>> {
 		if (s instanceof SelectSql && s.isPage())

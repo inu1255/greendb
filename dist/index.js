@@ -17,6 +17,9 @@ exports.Table = schema_1.Table;
 exports.Field = schema_1.Field;
 exports.Constraint = schema_1.Constraint;
 exports.TableBuilder = schema_1.TableBuilder;
+var utils_1 = require("./utils");
+exports.CamelCase = utils_1.CamelCase;
+exports.camelCase = utils_1.camelCase;
 function createPool(url, config) {
     if (!config)
         config = url;

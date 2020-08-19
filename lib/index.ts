@@ -2,6 +2,7 @@ import {arr, val, Where, Engine, IEngine, PoolEngine, ConnEngine, ExecSqlOptions
 import {PoolConfig as MysqlPoolConfig} from "mysql";
 import {PoolConfig as PostgresqlPoolConfig} from "pg";
 import {SchemaBuilder, Table, TableChange, Field, Constraint, TableBuilder} from "./schema";
+import {CamelCase, camelCase} from "./utils";
 
 function createPool(url: string | "mysql" | "sqlite" | "postgresql", config?: string | MysqlPoolConfig | PostgresqlPoolConfig): Engine {
 	if (!config) config = url;
@@ -39,4 +40,6 @@ export {
 	TableChange,
 	TableBuilder,
 	SchemaBuilder,
+	CamelCase,
+	camelCase,
 };

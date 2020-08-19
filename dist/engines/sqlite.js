@@ -28,7 +28,7 @@ function EngineOverride(Base) {
             return _super !== null && _super.apply(this, arguments) || this;
         }
         class_1.prototype.quotes = function (key) {
-            return key.replace(/(?<!["'[\w])\w+(?!["'\]\w])/g, function (x) { return "[" + x + "]"; });
+            return key.replace(/(?<!["'[\w])\w+(?!["'\]\w])/, function (x) { return "[" + x + "]"; });
         };
         class_1.prototype.runSql = function (s) {
             var _this = this;

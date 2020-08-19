@@ -86,14 +86,11 @@ function EngineOverride<B extends new (...args: any[]) => IEngine>(Base: B) {
 				.then((rows) => rows[0].db)
 				.then((x) => {
 					db = x;
-					return this.execSQL("select oid from pg_namespace where nspowner=(select datdba from pg_database where datname=?) and nspname=?", [db, nspname]).then(
-						(rows) => rows[0].oid
-					);
+					return this.execSQL("select oid from pg_namespace where nspname=?", [nspname]).then((rows) => rows[0].oid);
 				})
 				.then((oid) => {
 					return this.execSQL(`select oid,relname from pg_class where relkind='r' and relpersistence='p' and relnamespace=?`, [oid]).then((tables: PgTable[]) => ({
 						db,
-						oid,
 						tables,
 					}));
 				})

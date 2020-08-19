@@ -18,12 +18,12 @@ describe("greendb builder test", () => {
 			{id: 2, name: "李四", age: 88, sex: "boy"},
 		];
 		var insert_sql = db.insert("user", users);
-		expect(insert_sql.sql).to.equal("insert into `user` (id,name,age,sex) values(?,?,?,?),(?,?,?,?)");
+		expect(insert_sql.sql).to.equal("insert into `user` (`id`,`name`,`age`,`sex`) values(?,?,?,?),(?,?,?,?)");
 		expect(insert_sql.args).to.eql([1, "张三", 18, "girl", 2, "李四", 88, "boy"]);
 
 		// 更新数据
 		var update_sql = db.update("user", {name: "王麻子"}).where({id: 3});
-		expect(update_sql.sql).to.equal("update `user` set name=? where  ( (id=?))");
+		expect(update_sql.sql).to.equal("update `user` set `name`=? where  ( (id=?))");
 		expect(update_sql.args).to.eql(["王麻子", 3]);
 
 		// 一个简单的查询

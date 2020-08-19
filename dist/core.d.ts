@@ -149,7 +149,9 @@ declare class SqlWhere<T> extends SqlWhere_base implements Promise<T> {
 export declare class InsertSql<T = any> extends Sql implements Promise<T> {
     protected _id: boolean;
     protected _ignore: string;
+    private _data;
     constructor(table: string, data: any);
+    engine(e: IEngine): this;
     readonly sql: string;
     pack(rows: any): any;
     id(): this;
@@ -179,7 +181,9 @@ export declare class SelectSql<T = any> extends SqlWhere<T> {
     exclude(keys: string[]): PromiseLike<any>;
 }
 export declare class UpdateSql<T = any> extends SqlWhere<T> {
+    private _data;
     constructor(table: string, data: any);
+    engine(e: IEngine): this;
     readonly sql: string;
     run(): Promise<any>;
 }

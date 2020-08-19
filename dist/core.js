@@ -215,9 +215,13 @@ var InsertSql = /** @class */ (function (_super) {
         var _this = _super.call(this, table) || this;
         _this._args = [];
         _this._ignore = "";
-        _this.load(wrapInsert(data));
+        _this._data = data;
         return _this;
     }
+    InsertSql.prototype.engine = function (e) {
+        this.load(wrapInsert(this._data, function (x) { return e.quotes(x); }));
+        return _super.prototype.engine.call(this, e);
+    };
     Object.defineProperty(InsertSql.prototype, "sql", {
         get: function () {
             return "insert " + this._ignore + "into " + this.quotes(this._table) + " " + this._sql;
@@ -337,9 +341,13 @@ var UpdateSql = /** @class */ (function (_super) {
     __extends(UpdateSql, _super);
     function UpdateSql(table, data) {
         var _this = _super.call(this, table) || this;
-        _this.load(wrapSet(data));
+        _this._data = data;
         return _this;
     }
+    UpdateSql.prototype.engine = function (e) {
+        this.load(wrapSet(this._data, function (x) { return e.quotes(x); }));
+        return _super.prototype.engine.call(this, e);
+    };
     Object.defineProperty(UpdateSql.prototype, "sql", {
         get: function () {
             return "update " + this.quotes(this._table) + " set " + this._sql + this._where.toWhere();
@@ -431,7 +439,8 @@ var InsertOrUpdate = /** @class */ (function (_super) {
         return new SelectSql(this._table).where(this._where).first().engine(this._e);
     };
     InsertOrUpdate.prototype.wrapSet = function () {
-        return wrapSet(this._updateData);
+        var _this = this;
+        return wrapSet(this._updateData, function (x) { return _this._e.quotes(x); });
     };
     InsertOrUpdate.prototype.hasWhere = function () {
         return !this._where.isEmpty();
@@ -447,7 +456,7 @@ exports.InsertOrUpdate = InsertOrUpdate;
  * id=?,name=?
  * @param data
  */
-function wrapSet(data) {
+function wrapSet(data, quotes) {
     if (data instanceof Raw)
         return data;
     var keys = [];
@@ -457,11 +466,11 @@ function wrapSet(data) {
         if (v === undefined)
             continue;
         if (v instanceof Raw) {
-            keys.push(k + "=(" + v.sql + ")");
+            keys.push(quotes(k) + "=(" + v.sql + ")");
             args.push.apply(args, v.args);
         }
         else {
-            keys.push(k + "=?");
+            keys.push(quotes(k) + "=?");
             args.push(val(v));
         }
     }
@@ -530,12 +539,12 @@ function warpValues(data, keys) {
  * (id,name) values(?,?),(?,?)
  * @param data
  */
-function wrapInsert(data) {
+function wrapInsert(data, quotes) {
     data = arr(data);
     if (data.length > 0) {
         var keys = [];
         var raw = warpValues(data[0], keys);
-        var dst = new Raw("(" + keys.join(",") + ") values" + raw.sql, raw.args);
+        var dst = new Raw("(" + keys.map(quotes).join(",") + ") values" + raw.sql, raw.args);
         for (var i = 1; i < data.length; i++) {
             var item = data[i];
             raw = warpValues(item, keys);
@@ -597,7 +606,7 @@ var Engine = /** @class */ (function () {
     };
     //#region override 通过重载以下进行Engine定制
     Engine.prototype.quotes = function (key) {
-        return key.replace(/(?<!["'\w])\w+(?!["'\w])/g, function (x) { return "\"" + x + "\""; });
+        return key.replace(/(?<!["'\w])\w+(?!["'\w])/, function (x) { return "\"" + x + "\""; });
     };
     Engine.prototype.runSql = function (s) {
         var _this = this;

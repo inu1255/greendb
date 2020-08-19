@@ -47,7 +47,7 @@ function EngineOverride(Base) {
             return _super !== null && _super.apply(this, arguments) || this;
         }
         class_1.prototype.quotes = function (key) {
-            return key.replace(/(?<!["'\w])\w+(?!["'\w])/g, function (x) { return "`" + x + "`"; });
+            return key.replace(/(?<!["'\w])\w+(?!["'\w])/, function (x) { return "`" + x + "`"; });
         };
         class_1.prototype.runSql = function (s) {
             if (s instanceof __1.SelectSql && s.isPage()) {
@@ -119,7 +119,7 @@ function EngineOverride(Base) {
                         var tb = tbs.get(row.TABLE_NAME);
                         tb.addField({
                             name: row.COLUMN_NAME,
-                            type: row.COLUMN_TYPE.replace("bigint(20)", "bigint").replace("int(10)", "int"),
+                            type: row.COLUMN_TYPE.replace("bigint(20)", "bigint").replace("int(10)", "int").replace("int(11)", "int"),
                             table: row.TABLE_NAME,
                             default: row.COLUMN_DEFAULT,
                             comment: row.COLUMN_COMMENT,
@@ -203,7 +203,7 @@ function EngineOverride(Base) {
         };
         class_1.prototype.migration = function (newTable, oldTable) {
             var _this = this;
-            var list = newTable.migrationFrom(oldTable, function (a, b) { return a.strictEqual(b) && a.comment == b.comment; });
+            var list = newTable.migrationFrom(oldTable, function (a, b) { return a.strictEqual(b) && (a.comment || "") == (b.comment || ""); });
             var table = oldTable.name;
             return list.map(function (f) {
                 // 约束

@@ -69,7 +69,7 @@ interface SchemaConstraint {
 function EngineOverride<B extends new (...args: any[]) => IEngine>(Base: B) {
 	return class extends Base {
 		quotes(key: string) {
-			return key.replace(/(?<!["'\w])\w+(?!["'\w])/g, (x) => `\`${x}\``);
+			return key.replace(/(?<!["'\w])\w+(?!["'\w])/, (x) => `\`${x}\``);
 		}
 		runSql(s: ISql) {
 			if (s instanceof SelectSql && s.isPage()) {
@@ -137,7 +137,7 @@ function EngineOverride<B extends new (...args: any[]) => IEngine>(Base: B) {
 						let tb = tbs.get(row.TABLE_NAME);
 						tb.addField({
 							name: row.COLUMN_NAME,
-							type: row.COLUMN_TYPE.replace("bigint(20)", "bigint").replace("int(10)", "int"),
+							type: row.COLUMN_TYPE.replace("bigint(20)", "bigint").replace("int(10)", "int").replace("int(11)", "int"),
 							table: row.TABLE_NAME,
 							default: row.COLUMN_DEFAULT,
 							comment: row.COLUMN_COMMENT,
@@ -206,7 +206,7 @@ function EngineOverride<B extends new (...args: any[]) => IEngine>(Base: B) {
 			return [sql.join("\n")];
 		}
 		migration(newTable: Table, oldTable: Table): string[] {
-			let list = newTable.migrationFrom(oldTable, (a, b) => a.strictEqual(b) && a.comment == b.comment);
+			let list = newTable.migrationFrom(oldTable, (a, b) => a.strictEqual(b) && (a.comment || "") == (b.comment || ""));
 			let table = oldTable.name;
 			return list.map((f) => {
 				// 约束

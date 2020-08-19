@@ -11,7 +11,7 @@ declare module "sqlite3" {
 function EngineOverride<B extends new (...args: any[]) => IEngine>(Base: B) {
 	return class extends Base {
 		quotes(key: string) {
-			return key.replace(/(?<!["'[\w])\w+(?!["'\]\w])/g, (x) => `[${x}]`);
+			return key.replace(/(?<!["'[\w])\w+(?!["'\]\w])/, (x) => `[${x}]`);
 		}
 		runSql(s: ISql) {
 			if (s instanceof InsertSql && s.returnId()) {

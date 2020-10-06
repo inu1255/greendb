@@ -205,4 +205,21 @@ describe("other test", () => {
 		]);
 		assert(list.reduce((a, b) => ({ok: a.ok && a.prev < b, prev: b}), {ok: true, prev: 0}).ok, "运行效率顺序出错");
 	});
+
+	it("get today", () => {
+		let list = compare(10000, [
+			function () {
+				new Date(Math.floor(Date.now() / 86400e3) * 86400e3 - 28800e3).getTime();
+			},
+			function () {
+				var now = Date.now();
+				new Date(now - (now % 86400e3) - 28800e3).getTime();
+			},
+			function () {
+				new Date(new Date().toLocaleDateString()).getTime();
+			},
+		]);
+		assert(list.reduce((a, b) => ({ok: a.ok && a.prev < b, prev: b}), {ok: true, prev: 0}).ok, "运行效率顺序出错");
+	});
+	new Date(new Date().toLocaleDateString()).getTime();
 });

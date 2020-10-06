@@ -122,8 +122,8 @@ export declare class SchemaBuilder {
     /** get or define table */
     table(name: string, fields?: Array<FieldBuilder | ConstraintBuilder>): TableBuilder;
     mapTable<T>(fn: (table: Table) => T): T[];
-    migrationFrom(old: SchemaBuilder | Table[], fn: (newTable: Table, oldTable: Table) => Promise<any>): Promise<any[]>;
-    sync(db: IEngine, dropTable?: boolean): Promise<any[]>;
+    migrationFrom<T>(old: SchemaBuilder | Table[], fn: (newTable: Table, oldTable: Table) => T): T[];
+    sync(db: IEngine, dropTable?: boolean): Promise<string[]>;
     private field;
     varchar(name: string, len: number): FieldBuilder;
     text(name: string): FieldBuilder;

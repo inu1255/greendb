@@ -214,17 +214,17 @@ var Table = /** @class */ (function () {
                     f0 = f;
                     break;
                 }
-                if (!flike && f.type == f1.type && f.default == f1.default) {
+                if (!this.fields[f.name] && !flike && f.type == f1.type && f.default == f1.default) {
                     flike = f;
                 }
             }
             if (!f0)
                 f0 = flike;
+            // 有同一个字段
             if (f0) {
                 fromFields.splice(fromFields.indexOf(f0), 1);
-                // 有同一个字段
+                // 如果字段发生改变
                 if (!(compareField ? compareField(f1, f0) : f1.strictEqual(f0))) {
-                    // 如果字段发生改变
                     list.push({ from: f0, to: f1, after: prev });
                 }
             }
@@ -365,6 +365,8 @@ var SchemaBuilder = /** @class */ (function () {
             var v = oldMap[k];
             pmss.push(fn(null, v));
         }
+        if (!pmss[0] || !pmss[0].then)
+            return pmss;
         return Promise.all(pmss);
     };
     SchemaBuilder.prototype.sync = function (db, dropTable) {
@@ -372,12 +374,13 @@ var SchemaBuilder = /** @class */ (function () {
         return db.getTables().then(function (tables) {
             return _this.migrationFrom(tables, function (newTable, oldTable) {
                 if (newTable && oldTable)
-                    return db.execSQL(db.migration(newTable, oldTable));
+                    return db.migration(newTable, oldTable);
                 if (newTable)
-                    return db.execSQL(db.createTable(newTable));
+                    return db.createTable(newTable);
                 if (oldTable && dropTable)
-                    return db.execSQL("drop table " + db.quotes(oldTable.name));
-            });
+                    return ["drop table " + db.quotes(oldTable.name)];
+                return [];
+            }).reduce(function (a, b) { return a.concat(b); }, []);
         });
     };
     //#region 字段

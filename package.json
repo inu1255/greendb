@@ -1,6 +1,6 @@
 {
 	"name": "greendb",
-	"version": "2.0.10",
+	"version": "2.0.12",
 	"description": "create npm package with typescript",
 	"main": "dist/index.js",
 	"scripts": {

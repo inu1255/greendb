@@ -221,8 +221,9 @@ function EngineOverride<B extends new (...args: any[]) => IEngine>(Base: B) {
 					return `alter table ${this.quotes(table)} drop index ${this.quotes(f.data.name)}`;
 				}
 				// 字段
-				if (f.from && f.to) return `alter table ${this.quotes(table)} change ${this.quotes(f.from.name)} ${this.fieldSql(f.to)} ${f.after ? "after " + f.after : "first"}`;
-				if (f.to) return `alter table ${this.quotes(table)} add column ${this.fieldSql(f.to)} ${f.after ? "after " + f.after : "first"}`;
+				if (f.from && f.to)
+					return `alter table ${this.quotes(table)} change ${this.quotes(f.from.name)} ${this.fieldSql(f.to)} ${f.after ? "after " + this.quotes(f.after) : "first"}`;
+				if (f.to) return `alter table ${this.quotes(table)} add column ${this.fieldSql(f.to)} ${f.after ? "after " + this.quotes(f.after) : "first"}`;
 				return `alter table ${this.quotes(table)} drop column ${f.from.name}`;
 			});
 		}

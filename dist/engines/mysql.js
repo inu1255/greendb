@@ -219,9 +219,9 @@ function EngineOverride(Base) {
                 }
                 // 字段
                 if (f.from && f.to)
-                    return "alter table " + _this.quotes(table) + " change " + _this.quotes(f.from.name) + " " + _this.fieldSql(f.to) + " " + (f.after ? "after " + f.after : "first");
+                    return "alter table " + _this.quotes(table) + " change " + _this.quotes(f.from.name) + " " + _this.fieldSql(f.to) + " " + (f.after ? "after " + _this.quotes(f.after) : "first");
                 if (f.to)
-                    return "alter table " + _this.quotes(table) + " add column " + _this.fieldSql(f.to) + " " + (f.after ? "after " + f.after : "first");
+                    return "alter table " + _this.quotes(table) + " add column " + _this.fieldSql(f.to) + " " + (f.after ? "after " + _this.quotes(f.after) : "first");
                 return "alter table " + _this.quotes(table) + " drop column " + f.from.name;
             });
         };

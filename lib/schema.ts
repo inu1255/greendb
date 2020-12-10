@@ -16,11 +16,14 @@ interface IField {
 	inc: boolean;
 	// 以下字段与数据库无关
 	opts?: string[];
+	bits?: string[];
+	reg?: [RegExp, string?];
+	ext?: any;
 	mocks?: any[];
 	update?: string;
 }
 
-export class Field {
+export class Field implements IField {
 	name: string;
 	type: string;
 	table: string;
@@ -31,6 +34,9 @@ export class Field {
 	inc: boolean;
 	// 以下字段与数据库无关
 	opts?: string[];
+	bits?: string[];
+	reg?: [RegExp, string?];
+	ext?: any;
 	mocks?: any[];
 	update?: string;
 	constructor() {
@@ -90,6 +96,18 @@ export class FieldBuilder {
 	}
 	opts(items: string[]) {
 		this._field.opts = items;
+		return this;
+	}
+	bits(items: string[]) {
+		this._field.bits = items;
+		return this;
+	}
+	reg(regex: RegExp, why?: string) {
+		this._field.reg = [regex, why];
+		return this;
+	}
+	ext(ext: any) {
+		this._field.reg = ext;
 		return this;
 	}
 	mock(items: any[]) {

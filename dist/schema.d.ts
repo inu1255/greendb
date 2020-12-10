@@ -9,10 +9,13 @@ interface IField {
     null: boolean;
     inc: boolean;
     opts?: string[];
+    bits?: string[];
+    reg?: [RegExp, string?];
+    ext?: any;
     mocks?: any[];
     update?: string;
 }
-export declare class Field {
+export declare class Field implements IField {
     name: string;
     type: string;
     table: string;
@@ -22,6 +25,9 @@ export declare class Field {
     null: boolean;
     inc: boolean;
     opts?: string[];
+    bits?: string[];
+    reg?: [RegExp, string?];
+    ext?: any;
     mocks?: any[];
     update?: string;
     constructor();
@@ -39,6 +45,9 @@ export declare class FieldBuilder {
     charset(charset: string): this;
     comment(comment: string): this;
     opts(items: string[]): this;
+    bits(items: string[]): this;
+    reg(regex: RegExp, why?: string): this;
+    ext(ext: any): this;
     mock(items: any[]): this;
     update(v: string): this;
     build(): Field;

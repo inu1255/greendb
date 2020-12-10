@@ -653,7 +653,7 @@ export abstract class ConnEngine extends Engine {
 		let db = this;
 		opts = opts || {};
 		args = args || [];
-		let ss = arr(sqls);
+		let ss = arr(sqls).filter((x) => x);
 		for (let s of ss) {
 			if (typeof s != "string" && !instanceOfSql(s)) throw new Error("execSQL params must be string or ISql");
 		}

@@ -66,6 +66,18 @@ var FieldBuilder = /** @class */ (function () {
         this._field.opts = items;
         return this;
     };
+    FieldBuilder.prototype.bits = function (items) {
+        this._field.bits = items;
+        return this;
+    };
+    FieldBuilder.prototype.reg = function (regex, why) {
+        this._field.reg = [regex, why];
+        return this;
+    };
+    FieldBuilder.prototype.ext = function (ext) {
+        this._field.reg = ext;
+        return this;
+    };
     FieldBuilder.prototype.mock = function (items) {
         this._field.mocks = items;
         return this;

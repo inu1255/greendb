@@ -700,7 +700,7 @@ var ConnEngine = /** @class */ (function (_super) {
         var db = this;
         opts = opts || {};
         args = args || [];
-        var ss = arr(sqls);
+        var ss = arr(sqls).filter(function (x) { return x; });
         for (var _i = 0, ss_1 = ss; _i < ss_1.length; _i++) {
             var s = ss_1[_i];
             if (typeof s != "string" && !instanceOfSql(s))

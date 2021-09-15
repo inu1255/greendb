@@ -13,6 +13,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.PoolEngine = exports.ConnEngine = exports.Engine = exports.EngineConfig = exports.instanceOfSql = exports.InsertOrUpdate = exports.InsertNotExist = exports.DeleteSql = exports.UpdateSql = exports.SelectSql = exports.InsertSql = exports.Sql = exports.Where = exports.Raw = exports.arr = exports.val = void 0;
 var mixins_1 = require("./mixins");
 /**
  * 把v转换为mysql可以接收的参数，把对象转换成json字符串
@@ -51,14 +52,14 @@ var Raw = /** @class */ (function () {
         get: function () {
             return this._sql;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(Raw.prototype, "args", {
         get: function () {
             return this._args;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     /**
@@ -197,14 +198,14 @@ var SqlWhere = /** @class */ (function (_super) {
         get: function () {
             return "" + this._sql + this.quotes(this._table) + this._where.toWhere();
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(SqlWhere.prototype, "args", {
         get: function () {
             return this._args.concat(this._where.args);
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     return SqlWhere;
@@ -226,7 +227,7 @@ var InsertSql = /** @class */ (function (_super) {
         get: function () {
             return "insert " + this._ignore + "into " + this.quotes(this._table) + " " + this._sql;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     InsertSql.prototype.pack = function (rows) {
@@ -270,7 +271,7 @@ var SelectSql = /** @class */ (function (_super) {
         get: function () {
             return "select " + this._keys.join(",") + " from " + this.quotes(this._table) + this._where.toWhere() + this._order + this._limit;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     /**
@@ -352,7 +353,7 @@ var UpdateSql = /** @class */ (function (_super) {
         get: function () {
             return "update " + this.quotes(this._table) + " set " + this._sql + this._where.toWhere();
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     UpdateSql.prototype.run = function () {

@@ -127,7 +127,7 @@ export declare class TableBuilder {
 export declare class SchemaBuilder {
     private _tables;
     constructor();
-    readonly tables: Table[];
+    get tables(): Table[];
     /** get or define table */
     table(name: string, fields?: Array<FieldBuilder | ConstraintBuilder>): TableBuilder;
     mapTable<T>(fn: (table: Table) => T): T[];

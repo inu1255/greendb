@@ -13,6 +13,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.Wherable = exports.Tablable = exports.Runnable = exports.Base = void 0;
 var _1 = require(".");
 var Base = /** @class */ (function () {
     function Base() {

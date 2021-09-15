@@ -11,6 +11,7 @@ declare module "sqlite3" {
 function EngineOverride<B extends new (...args: any[]) => IEngine>(Base: B) {
 	return class extends Base {
 		quotes(key: string) {
+			if(key[0]=='(') return key;
 			return key.replace(/(?<!["'[\w])\w+(?!["'\]\w])/, (x) => `[${x}]`);
 		}
 		runSql(s: ISql) {
@@ -266,7 +267,7 @@ export = EngineOverride(
 					}
 				});
 				pool.end = function () {
-					return new Promise((resolve, reject) => {
+					return new Promise<void>((resolve, reject) => {
 						var idx = pools.indexOf(this);
 						if (idx >= 0) pools.splice(idx, 1);
 						this.close((err) => (err ? reject(err) : resolve()));

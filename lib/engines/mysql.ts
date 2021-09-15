@@ -297,6 +297,7 @@ const KEYS = new Set([
 function EngineOverride<B extends new (...args: any[]) => IEngine>(Base: B) {
 	return class extends Base {
 		quotes(key: string) {
+			if(key[0]=='(') return key;
 			return key.replace(/(?<!["'\w])\w+(?!["'\w])/, (x) => (KEYS.has(x.toUpperCase()) ? `\`${x}\`` : x));
 		}
 		runSql(s: ISql) {

@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.SchemaBuilder = exports.TableBuilder = exports.Table = exports.ConstraintBuilder = exports.Constraint = exports.FieldBuilder = exports.Field = void 0;
 function compare(a, b) {
     if (a == b)
         return true;
@@ -179,13 +180,13 @@ var Table = /** @class */ (function () {
     Table.prototype.addField = function (field) {
         var f = field instanceof Field ? field : new FieldBuilder(field.name, field.type).from(field).table(this.name).build();
         if (this.fields[f.name])
-            throw new Error("table " + name + ": duplicate field " + f.name);
+            throw new Error("table " + this.name + ": duplicate field " + f.name);
         this.fields[f.name] = f;
     };
     Table.prototype.addConstraint = function (constraint) {
         if (constraint.type.toLowerCase() === "primary") {
             if (this.primary)
-                throw new Error("table " + name + ": duplicate primary key");
+                throw new Error("table " + this.name + ": duplicate primary key");
             this.primary = constraint;
         }
         else
@@ -340,7 +341,7 @@ var SchemaBuilder = /** @class */ (function () {
         get: function () {
             return this.mapTable(function (x) { return x; });
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     /** get or define table */

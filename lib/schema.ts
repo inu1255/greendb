@@ -235,12 +235,12 @@ export class Table {
 	}
 	addField(field: IField) {
 		let f = field instanceof Field ? field : new FieldBuilder(field.name, field.type).from(field).table(this.name).build();
-		if (this.fields[f.name]) throw new Error(`table ${name}: duplicate field ${f.name}`);
+		if (this.fields[f.name]) throw new Error(`table ${this.name}: duplicate field ${f.name}`);
 		this.fields[f.name] = f;
 	}
 	addConstraint(constraint: Constraint) {
 		if (constraint.type.toLowerCase() === "primary") {
-			if (this.primary) throw new Error(`table ${name}: duplicate primary key`);
+			if (this.primary) throw new Error(`table ${this.name}: duplicate primary key`);
 			this.primary = constraint;
 		} else this.constraints[constraint.name] = constraint;
 	}

@@ -49,8 +49,8 @@ export declare class Raw implements ISql, CloneAble {
     protected _sql: string;
     protected _args: any[];
     constructor(sql?: string, args?: any);
-    readonly sql: string;
-    readonly args: any[];
+    get sql(): string;
+    get args(): any[];
     /**
      * 用args替换sql中的?并返回字符串
      * @returns {string}
@@ -143,8 +143,8 @@ declare const SqlWhere_base: {
 } & typeof Sql;
 declare class SqlWhere<T> extends SqlWhere_base implements Promise<T> {
     constructor(table: string);
-    readonly sql: string;
-    readonly args: any[];
+    get sql(): string;
+    get args(): any[];
 }
 export declare class InsertSql<T = any> extends Sql implements Promise<T> {
     protected _id: boolean;
@@ -152,7 +152,7 @@ export declare class InsertSql<T = any> extends Sql implements Promise<T> {
     private _data;
     constructor(table: string, data: any);
     engine(e: IEngine): this;
-    readonly sql: string;
+    get sql(): string;
     pack(rows: any): any;
     id(): this;
     returnId(): boolean;
@@ -167,7 +167,7 @@ export declare class SelectSql<T = any> extends SqlWhere<T> {
     protected _first: boolean;
     protected _exclude: string[];
     constructor(table: string, keys?: string | string[]);
-    readonly sql: string;
+    get sql(): string;
     /**
      * @param {String} [key]
      */
@@ -184,7 +184,7 @@ export declare class UpdateSql<T = any> extends SqlWhere<T> {
     private _data;
     constructor(table: string, data: any);
     engine(e: IEngine): this;
-    readonly sql: string;
+    get sql(): string;
     run(): Promise<any>;
 }
 export declare class DeleteSql<T = any> extends SqlWhere<T> {

@@ -52,7 +52,7 @@ var FieldBuilder = /** @class */ (function () {
         return this;
     };
     FieldBuilder.prototype.default = function (def) {
-        this._field.default = def.toString();
+        this._field.default = def;
         return this;
     };
     FieldBuilder.prototype.charset = function (charset) {

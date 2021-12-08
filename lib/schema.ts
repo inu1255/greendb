@@ -83,7 +83,7 @@ export class FieldBuilder {
 		return this;
 	}
 	default(def: any) {
-		this._field.default = def.toString();
+		this._field.default = def;
 		return this;
 	}
 	charset(charset: string) {

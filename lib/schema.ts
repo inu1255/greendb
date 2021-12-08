@@ -429,7 +429,7 @@ export class SchemaBuilder {
 		);
 	}
 	//#region 字段
-	private field(name: string, type: string) {
+	field(name: string, type: string) {
 		return new FieldBuilder(name, type.toLowerCase());
 	}
 	varchar(name: string, len: number) {

@@ -133,7 +133,7 @@ export declare class SchemaBuilder {
     mapTable<T>(fn: (table: Table) => T): T[];
     migrationFrom<T>(old: SchemaBuilder | Table[], fn: (newTable: Table, oldTable: Table) => T): T[];
     sync(db: IEngine, dropTable?: boolean): Promise<string[]>;
-    private field;
+    field(name: string, type: string): FieldBuilder;
     varchar(name: string, len: number): FieldBuilder;
     text(name: string): FieldBuilder;
     json(name: string): FieldBuilder;

@@ -646,6 +646,8 @@ var Engine = /** @class */ (function () {
             return v.toString();
         if (typeof v === "string")
             return "'" + v.replace(/'/g, "''") + "'";
+        if (v instanceof Raw)
+            return v.toString();
         return "'" + JSON.stringify(v).replace(/'/g, "''") + "'";
     };
     Engine.prototype.setLogger = function (log) {

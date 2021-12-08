@@ -599,6 +599,7 @@ export abstract class Engine implements IEngine {
 		if (v == null) return "null";
 		if (typeof v === "number") return v.toString();
 		if (typeof v === "string") return `'${v.replace(/'/g, "''")}'`;
+		if(v instanceof Raw) return v.toString();
 		return `'${JSON.stringify(v).replace(/'/g, "''")}'`;
 	}
 	setLogger(log?: Logger) {

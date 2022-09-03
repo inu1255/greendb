@@ -435,6 +435,14 @@ function EngineOverride<B extends new (...args: any[]) => IEngine>(Base: B) {
 			return [sql.join("\n")];
 		}
 		migration(newTable: Table, oldTable: Table): string[] {
+			for(let k in newTable.fields){
+				let v = newTable.fields[k]
+				if (v.charset == newTable.charset) v.charset = null;
+			}
+			for(let k in oldTable.fields){
+				let v = oldTable.fields[k]
+				if (v.charset == oldTable.charset) v.charset = null;
+			}
 			let list = newTable.migrationFrom(oldTable, (a, b) => a.strictEqual(b) && (a.comment || "") == (b.comment || ""));
 			let table = oldTable.name;
 			return list.map((f) => {

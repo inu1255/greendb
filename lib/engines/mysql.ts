@@ -304,12 +304,12 @@ function EngineOverride<B extends new (...args: any[]) => IEngine>(Base: B) {
 			if (s instanceof SelectSql && s.isPage()) {
 				let {sql, args} = s;
 				sql = sql.replace("select ", "select sql_calc_found_rows ");
-				return this.execSQL([{sql, args}, "select found_rows() as total"], [], {transaction: false}).then((rows) => {
+				return this.execSQL([{sql, args}, "select found_rows() as total"], [], {transaction: false, ignore: s.ignore_log}).then((rows) => {
 					return {list: rows[0], total: rows[1][0].total};
 				});
 			}
 			if (s instanceof InsertSql && s.returnId()) {
-				return this.execSQL({sql: s.sql, args: s.args, pack: (rows) => rows.insertId});
+				return this.execSQL({sql: s.sql, args: s.args, ignore_log: s.ignore_log, pack: (rows) => rows.insertId});
 			}
 			if (s instanceof InsertOrUpdate && !s.hasWhere()) {
 				let insert = s.insertSql();

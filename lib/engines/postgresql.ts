@@ -56,7 +56,7 @@ function EngineOverride<B extends new (...args: any[]) => IEngine>(Base: B) {
 	return class extends Base {
 		runSql(s: ISql) {
 			if (s instanceof InsertSql && s.returnId()) {
-				return this.execSQL({sql: s.sql + " returning id", args: s.args, pack: (rows) => rows[0].id});
+				return this.execSQL({sql: s.sql + " returning id", args: s.args, ignore_log: s.ignore_log, pack: (rows) => rows[0].id});
 			}
 			if (s instanceof InsertOrUpdate && !s.hasWhere()) {
 				let insert = s.insertSql();

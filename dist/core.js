@@ -62,6 +62,10 @@ var Raw = /** @class */ (function () {
         enumerable: false,
         configurable: true
     });
+    Raw.prototype.quiet = function () {
+        this.ignore_log = true;
+        return this;
+    };
     /**
      * 用args替换sql中的?并返回字符串
      * @returns {string}
@@ -719,6 +723,7 @@ var ConnEngine = /** @class */ (function (_super) {
                 .then(function () {
                 if (instanceOfSql(sql)) {
                     var s_1 = sql;
+                    opts.ignore = s_1.ignore_log;
                     return db.SingleSQL(s_1.sql, s_1.args, opts).then(function (x) { return (s_1.pack ? s_1.pack(x) : x); });
                 }
                 return db.SingleSQL(sql, args, opts);

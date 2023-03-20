@@ -33,6 +33,7 @@ export interface Paged<T> {
 export interface ISql {
 	sql: string;
 	args: any[];
+	ignore_log?: boolean;
 	pack?(x: any): any;
 }
 
@@ -66,6 +67,7 @@ export class Raw implements ISql, CloneAble {
 	["constructor"]: typeof Raw;
 	protected _sql: string;
 	protected _args: any[];
+	ignore_log: boolean;
 	constructor(sql?: string, args?: any) {
 		this._sql = sql || "";
 		this._args = arr(args);
@@ -75,6 +77,10 @@ export class Raw implements ISql, CloneAble {
 	}
 	get args() {
 		return this._args;
+	}
+	quiet() {
+		this.ignore_log = true;
+		return this;
 	}
 	/**
 	 * 用args替换sql中的?并返回字符串
@@ -667,6 +673,7 @@ export abstract class ConnEngine extends Engine {
 				.then(() => {
 					if (instanceOfSql(sql)) {
 						let s = sql;
+						opts.ignore = s.ignore_log;
 						return db.SingleSQL(s.sql, s.args, opts).then((x) => (s.pack ? s.pack(x) : x));
 					}
 					return db.SingleSQL(sql, args, opts);

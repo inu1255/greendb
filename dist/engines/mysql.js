@@ -282,12 +282,12 @@ function EngineOverride(Base) {
             if (s instanceof __1.SelectSql && s.isPage()) {
                 var sql = s.sql, args = s.args;
                 sql = sql.replace("select ", "select sql_calc_found_rows ");
-                return this.execSQL([{ sql: sql, args: args }, "select found_rows() as total"], [], { transaction: false }).then(function (rows) {
+                return this.execSQL([{ sql: sql, args: args }, "select found_rows() as total"], [], { transaction: false, ignore: s.ignore_log }).then(function (rows) {
                     return { list: rows[0], total: rows[1][0].total };
                 });
             }
             if (s instanceof __1.InsertSql && s.returnId()) {
-                return this.execSQL({ sql: s.sql, args: s.args, pack: function (rows) { return rows.insertId; } });
+                return this.execSQL({ sql: s.sql, args: s.args, ignore_log: s.ignore_log, pack: function (rows) { return rows.insertId; } });
             }
             if (s instanceof __1.InsertOrUpdate && !s.hasWhere()) {
                 var insert = s.insertSql();

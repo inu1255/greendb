@@ -35,7 +35,7 @@ function EngineOverride(Base) {
         class_1.prototype.runSql = function (s) {
             var _this = this;
             if (s instanceof __1.InsertSql && s.returnId()) {
-                return this.execSQL({ sql: s.sql, args: s.args, pack: function (rows) { return rows.lastID; } });
+                return this.execSQL({ sql: s.sql, args: s.args, ignore_log: s.ignore_log, pack: function (rows) { return rows.lastID; } });
             }
             if (s instanceof __1.InsertOrUpdate && !s.hasWhere()) {
                 var insert = s.insertSql();

@@ -370,7 +370,7 @@ function EngineOverride<B extends new (...args: any[]) => IEngine>(Base: B) {
 							table: row.TABLE_NAME,
 							default: row.COLUMN_DEFAULT,
 							comment: row.COLUMN_COMMENT,
-							charset: row.CHARACTER_SET_NAME == schemata.DEFAULT_CHARACTER_SET_NAME ? null : row.CHARACTER_SET_NAME,
+							charset: row.CHARACTER_SET_NAME == (tb as any)._table.charset ? null : row.CHARACTER_SET_NAME,
 							null: row.IS_NULLABLE == "YES",
 							inc: row.EXTRA.toLowerCase() == "auto_increment",
 						});

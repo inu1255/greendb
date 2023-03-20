@@ -352,7 +352,7 @@ function EngineOverride(Base) {
                             table: row.TABLE_NAME,
                             default: row.COLUMN_DEFAULT,
                             comment: row.COLUMN_COMMENT,
-                            charset: row.CHARACTER_SET_NAME == schemata.DEFAULT_CHARACTER_SET_NAME ? null : row.CHARACTER_SET_NAME,
+                            charset: row.CHARACTER_SET_NAME == tb._table.charset ? null : row.CHARACTER_SET_NAME,
                             null: row.IS_NULLABLE == "YES",
                             inc: row.EXTRA.toLowerCase() == "auto_increment",
                         });
@@ -432,6 +432,16 @@ function EngineOverride(Base) {
         };
         class_1.prototype.migration = function (newTable, oldTable) {
             var _this = this;
+            for (var k in newTable.fields) {
+                var v = newTable.fields[k];
+                if (v.charset == newTable.charset)
+                    v.charset = null;
+            }
+            for (var k in oldTable.fields) {
+                var v = oldTable.fields[k];
+                if (v.charset == oldTable.charset)
+                    v.charset = null;
+            }
             var list = newTable.migrationFrom(oldTable, function (a, b) { return a.strictEqual(b) && (a.comment || "") == (b.comment || ""); });
             var table = oldTable.name;
             return list.map(function (f) {

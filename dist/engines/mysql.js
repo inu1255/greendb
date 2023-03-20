@@ -346,13 +346,14 @@ function EngineOverride(Base) {
                     for (var _a = 0, fields_1 = fields; _a < fields_1.length; _a++) {
                         var row = fields_1[_a];
                         var tb = tbs.get(row.TABLE_NAME);
+                        var charset = tb._table.charset || (schemata.DEFAULT_COLLATION_NAME || "").split("_")[0];
                         tb.addField({
                             name: row.COLUMN_NAME,
                             type: row.COLUMN_TYPE.replace("bigint(20)", "bigint").replace("int(10)", "int").replace("int(11)", "int"),
                             table: row.TABLE_NAME,
                             default: row.COLUMN_DEFAULT,
                             comment: row.COLUMN_COMMENT,
-                            charset: row.CHARACTER_SET_NAME == tb._table.charset ? null : row.CHARACTER_SET_NAME,
+                            charset: row.CHARACTER_SET_NAME == charset ? null : row.CHARACTER_SET_NAME,
                             null: row.IS_NULLABLE == "YES",
                             inc: row.EXTRA.toLowerCase() == "auto_increment",
                         });

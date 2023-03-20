@@ -364,13 +364,14 @@ function EngineOverride<B extends new (...args: any[]) => IEngine>(Base: B) {
 					}
 					for (let row of fields) {
 						let tb = tbs.get(row.TABLE_NAME);
+						let charset = (tb as any)._table.charset || (schemata.DEFAULT_COLLATION_NAME||"").split("_")[0];
 						tb.addField({
 							name: row.COLUMN_NAME,
 							type: row.COLUMN_TYPE.replace("bigint(20)", "bigint").replace("int(10)", "int").replace("int(11)", "int"),
 							table: row.TABLE_NAME,
 							default: row.COLUMN_DEFAULT,
 							comment: row.COLUMN_COMMENT,
-							charset: row.CHARACTER_SET_NAME == (tb as any)._table.charset ? null : row.CHARACTER_SET_NAME,
+							charset: row.CHARACTER_SET_NAME == charset ? null : row.CHARACTER_SET_NAME,
 							null: row.IS_NULLABLE == "YES",
 							inc: row.EXTRA.toLowerCase() == "auto_increment",
 						});

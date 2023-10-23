@@ -335,9 +335,10 @@ function EngineOverride(Base) {
                     for (var _i = 0, tables_1 = tables; _i < tables_1.length; _i++) {
                         var row = tables_1[_i];
                         var tb = new __1.TableBuilder(row.TABLE_NAME);
-                        if (row.TABLE_COLLATION != schemata.DEFAULT_COLLATION_NAME)
-                            tb.charset(row.TABLE_COLLATION.split("_")[0]);
-                        if (row.ENGINE != "InnoDB")
+                        var chatset = row.TABLE_COLLATION || schemata.DEFAULT_COLLATION_NAME;
+                        if (chatset)
+                            tb.charset(chatset.split("_")[0]);
+                        if (row.ENGINE)
                             tb.mysql_engine(row.ENGINE);
                         tb.comment(row.TABLE_COMMENT);
                         tbs.set(row.TABLE_NAME, tb);
@@ -346,14 +347,13 @@ function EngineOverride(Base) {
                     for (var _a = 0, fields_1 = fields; _a < fields_1.length; _a++) {
                         var row = fields_1[_a];
                         var tb = tbs.get(row.TABLE_NAME);
-                        var charset = tb._table.charset || (schemata.DEFAULT_COLLATION_NAME || "").split("_")[0];
                         tb.addField({
                             name: row.COLUMN_NAME,
                             type: row.COLUMN_TYPE.replace("bigint(20)", "bigint").replace("int(10)", "int").replace("int(11)", "int"),
                             table: row.TABLE_NAME,
                             default: row.COLUMN_DEFAULT,
                             comment: row.COLUMN_COMMENT,
-                            charset: row.CHARACTER_SET_NAME == charset ? null : row.CHARACTER_SET_NAME,
+                            charset: row.CHARACTER_SET_NAME || tb._table.charset,
                             null: row.IS_NULLABLE == "YES",
                             inc: row.EXTRA.toLowerCase() == "auto_increment",
                         });
@@ -435,17 +435,21 @@ function EngineOverride(Base) {
             var _this = this;
             for (var k in newTable.fields) {
                 var v = newTable.fields[k];
-                if (v.charset == newTable.charset)
+                if (!/^(varchar|text)/.test(v.type))
                     v.charset = null;
+                else if (!v.charset)
+                    v.charset = newTable.charset;
             }
             for (var k in oldTable.fields) {
                 var v = oldTable.fields[k];
-                if (v.charset == oldTable.charset)
+                if (!/^(varchar|text)/.test(v.type))
                     v.charset = null;
+                else if (!v.charset)
+                    v.charset = oldTable.charset;
             }
             var list = newTable.migrationFrom(oldTable, function (a, b) { return a.strictEqual(b) && (a.comment || "") == (b.comment || ""); });
             var table = oldTable.name;
-            return list.map(function (f) {
+            var sqls = list.map(function (f) {
                 // 约束
                 if ("type" in f) {
                     if (f.type == "create") {
@@ -464,6 +468,9 @@ function EngineOverride(Base) {
                     return "alter table " + _this.quotes(table) + " add column " + _this.fieldSql(f.to) + " " + (f.after ? "after " + _this.quotes(f.after) : "first");
                 return "alter table " + _this.quotes(table) + " drop column " + f.from.name;
             });
+            if (newTable.mysql_engine != oldTable.mysql_engine)
+                sqls.push("alter table " + this.quotes(table) + " engine=" + newTable.mysql_engine);
+            return sqls;
         };
         return class_1;
     }(Base));

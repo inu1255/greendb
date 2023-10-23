@@ -104,7 +104,9 @@ var Constraint = /** @class */ (function () {
         if (this.type != b.type)
             return false;
         if (this.type == "FOREIGN")
-            return compare(this.fields.join(), b.fields.join()) && compare(this.ref_fields.join(), b.ref_fields.join()) && compare(this.ref_table, b.ref_table);
+            return (compare(this.fields.join(), b.fields.join()) &&
+                compare(this.ref_fields.join(), b.ref_fields.join()) &&
+                compare(this.ref_table, b.ref_table));
         return compare(this.fields.join(), b.fields.join());
     };
     return Constraint;
@@ -120,7 +122,8 @@ var ConstraintBuilder = /** @class */ (function () {
         return this;
     };
     ConstraintBuilder.prototype.fields = function (fields) {
-        this._constraint.fields = typeof fields === "string" ? fields.split(",").map(function (x) { return x.trim(); }) : fields;
+        this._constraint.fields =
+            typeof fields === "string" ? fields.split(",").map(function (x) { return x.trim(); }) : fields;
         return this;
     };
     ConstraintBuilder.prototype.name = function (name) {
@@ -133,7 +136,8 @@ var ConstraintBuilder = /** @class */ (function () {
     };
     ConstraintBuilder.prototype.references = function (table, fields) {
         this._constraint.ref_table = table;
-        this._constraint.ref_fields = typeof fields === "string" ? fields.split(",").map(function (x) { return x.trim(); }) : fields;
+        this._constraint.ref_fields =
+            typeof fields === "string" ? fields.split(",").map(function (x) { return x.trim(); }) : fields;
         return this;
     };
     ConstraintBuilder.prototype.addFields = function (fields) {
@@ -154,7 +158,8 @@ var ConstraintBuilder = /** @class */ (function () {
     };
     ConstraintBuilder.prototype.build = function () {
         if (!this._constraint.name)
-            this._constraint.name = (this._table ? this._table + "__" : "") + this._constraint.fields.join("_");
+            this._constraint.name =
+                (this._table ? this._table + "__" : "") + this._constraint.fields.join("_");
         return this._constraint;
     };
     return ConstraintBuilder;
@@ -165,6 +170,8 @@ var Table = /** @class */ (function () {
         this.name = name;
         this.fields = {};
         this.constraints = {};
+        this.charset = "utf8";
+        this.mysql_engine = "InnoDB";
         if (fields)
             for (var _i = 0, fields_1 = fields; _i < fields_1.length; _i++) {
                 var field = fields_1[_i];
@@ -178,7 +185,9 @@ var Table = /** @class */ (function () {
             }
     }
     Table.prototype.addField = function (field) {
-        var f = field instanceof Field ? field : new FieldBuilder(field.name, field.type).from(field).table(this.name).build();
+        var f = field instanceof Field
+            ? field
+            : new FieldBuilder(field.name, field.type).from(field).table(this.name).build();
         if (this.fields[f.name])
             throw new Error("table " + this.name + ": duplicate field " + f.name);
         this.fields[f.name] = f;
@@ -290,7 +299,9 @@ var TableBuilder = /** @class */ (function () {
         var c = this._constraint_map[name];
         if (c)
             return c.addFields(constraint.fields).addRefFields(constraint.ref_fields);
-        return (this._constraint_map[name] = new ConstraintBuilder(constraint.type, constraint.fields).name(name).references(constraint.ref_table, constraint.ref_fields));
+        return (this._constraint_map[name] = new ConstraintBuilder(constraint.type, constraint.fields)
+            .name(name)
+            .references(constraint.ref_table, constraint.ref_fields));
     };
     TableBuilder.prototype.comment = function (comment) {
         this._table.comment = comment;

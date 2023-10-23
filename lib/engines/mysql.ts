@@ -356,22 +356,22 @@ function EngineOverride<B extends new (...args: any[]) => IEngine>(Base: B) {
 					let list: TableBuilder[] = [];
 					for (let row of tables) {
 						let tb = new TableBuilder(row.TABLE_NAME);
-						if (row.TABLE_COLLATION != schemata.DEFAULT_COLLATION_NAME) tb.charset(row.TABLE_COLLATION.split("_")[0]);
-						if (row.ENGINE != "InnoDB") tb.mysql_engine(row.ENGINE);
+						let chatset = row.TABLE_COLLATION || schemata.DEFAULT_COLLATION_NAME;
+						if (chatset) tb.charset(chatset.split("_")[0]);
+						if (row.ENGINE) tb.mysql_engine(row.ENGINE);
 						tb.comment(row.TABLE_COMMENT);
 						tbs.set(row.TABLE_NAME, tb);
 						list.push(tb);
 					}
 					for (let row of fields) {
 						let tb = tbs.get(row.TABLE_NAME);
-						let charset = (tb as any)._table.charset || (schemata.DEFAULT_COLLATION_NAME||"").split("_")[0];
 						tb.addField({
 							name: row.COLUMN_NAME,
 							type: row.COLUMN_TYPE.replace("bigint(20)", "bigint").replace("int(10)", "int").replace("int(11)", "int"),
 							table: row.TABLE_NAME,
 							default: row.COLUMN_DEFAULT,
 							comment: row.COLUMN_COMMENT,
-							charset: row.CHARACTER_SET_NAME == charset ? null : row.CHARACTER_SET_NAME,
+							charset: row.CHARACTER_SET_NAME || (tb as any)._table.charset,
 							null: row.IS_NULLABLE == "YES",
 							inc: row.EXTRA.toLowerCase() == "auto_increment",
 						});
@@ -438,15 +438,17 @@ function EngineOverride<B extends new (...args: any[]) => IEngine>(Base: B) {
 		migration(newTable: Table, oldTable: Table): string[] {
 			for(let k in newTable.fields){
 				let v = newTable.fields[k]
-				if (v.charset == newTable.charset) v.charset = null;
+                if (!/^(varchar|text)/.test(v.type)) v.charset = null;
+				else if(!v.charset) v.charset = newTable.charset;
 			}
 			for(let k in oldTable.fields){
 				let v = oldTable.fields[k]
-				if (v.charset == oldTable.charset) v.charset = null;
+                if (!/^(varchar|text)/.test(v.type)) v.charset = null;
+				else if(!v.charset) v.charset = oldTable.charset;
 			}
 			let list = newTable.migrationFrom(oldTable, (a, b) => a.strictEqual(b) && (a.comment || "") == (b.comment || ""));
 			let table = oldTable.name;
-			return list.map((f) => {
+			let sqls = list.map((f) => {
 				// 约束
 				if ("type" in f) {
 					if (f.type == "create") {
@@ -464,6 +466,9 @@ function EngineOverride<B extends new (...args: any[]) => IEngine>(Base: B) {
 				if (f.to) return `alter table ${this.quotes(table)} add column ${this.fieldSql(f.to)} ${f.after ? "after " + this.quotes(f.after) : "first"}`;
 				return `alter table ${this.quotes(table)} drop column ${f.from.name}`;
 			});
+			if (newTable.mysql_engine != oldTable.mysql_engine)
+				sqls.push(`alter table ${this.quotes(table)} engine=${newTable.mysql_engine}`);
+			return sqls;
 		}
 	};
 }

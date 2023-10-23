@@ -148,7 +148,11 @@ export class Constraint {
 	equal(b: Constraint) {
 		if (this.type != b.type) return false;
 		if (this.type == "FOREIGN")
-			return compare(this.fields.join(), b.fields.join()) && compare(this.ref_fields.join(), b.ref_fields.join()) && compare(this.ref_table, b.ref_table);
+			return (
+				compare(this.fields.join(), b.fields.join()) &&
+				compare(this.ref_fields.join(), b.ref_fields.join()) &&
+				compare(this.ref_table, b.ref_table)
+			);
 		return compare(this.fields.join(), b.fields.join());
 	}
 }
@@ -165,7 +169,8 @@ export class ConstraintBuilder {
 		return this;
 	}
 	fields(fields: string | string[]) {
-		this._constraint.fields = typeof fields === "string" ? fields.split(",").map((x) => x.trim()) : fields;
+		this._constraint.fields =
+			typeof fields === "string" ? fields.split(",").map((x) => x.trim()) : fields;
 		return this;
 	}
 	name(name: string) {
@@ -178,7 +183,8 @@ export class ConstraintBuilder {
 	}
 	references(table: string, fields: string | string[]) {
 		this._constraint.ref_table = table;
-		this._constraint.ref_fields = typeof fields === "string" ? fields.split(",").map((x) => x.trim()) : fields;
+		this._constraint.ref_fields =
+			typeof fields === "string" ? fields.split(",").map((x) => x.trim()) : fields;
 		return this;
 	}
 	addFields(fields: string | string[]) {
@@ -194,7 +200,9 @@ export class ConstraintBuilder {
 		return this;
 	}
 	build() {
-		if (!this._constraint.name) this._constraint.name = (this._table ? this._table + "__" : "") + this._constraint.fields.join("_");
+		if (!this._constraint.name)
+			this._constraint.name =
+				(this._table ? this._table + "__" : "") + this._constraint.fields.join("_");
 		return this._constraint;
 	}
 }
@@ -223,6 +231,8 @@ export class Table {
 		this.name = name;
 		this.fields = {};
 		this.constraints = {};
+		this.charset = "utf8";
+		this.mysql_engine = "InnoDB";
 		if (fields)
 			for (let field of fields) {
 				field.table(name);
@@ -234,7 +244,10 @@ export class Table {
 			}
 	}
 	addField(field: IField) {
-		let f = field instanceof Field ? field : new FieldBuilder(field.name, field.type).from(field).table(this.name).build();
+		let f =
+			field instanceof Field
+				? field
+				: new FieldBuilder(field.name, field.type).from(field).table(this.name).build();
 		if (this.fields[f.name]) throw new Error(`table ${this.name}: duplicate field ${f.name}`);
 		this.fields[f.name] = f;
 	}
@@ -336,7 +349,9 @@ export class TableBuilder {
 		let name = constraint.name || "$" + this._constraint_idx++;
 		let c = this._constraint_map[name];
 		if (c) return c.addFields(constraint.fields).addRefFields(constraint.ref_fields);
-		return (this._constraint_map[name] = new ConstraintBuilder(constraint.type, constraint.fields).name(name).references(constraint.ref_table, constraint.ref_fields));
+		return (this._constraint_map[name] = new ConstraintBuilder(constraint.type, constraint.fields)
+			.name(name)
+			.references(constraint.ref_table, constraint.ref_fields));
 	}
 	comment(comment: string) {
 		this._table.comment = comment;

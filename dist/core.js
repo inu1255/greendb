@@ -695,11 +695,20 @@ var ConnEngine = /** @class */ (function (_super) {
         var _this = this;
         if (opts.ignore)
             return this.queryAsync(sql, args, opts);
+        var i = 0;
+        var msg = sql.replace(/\?/g, function () {
+            var s = args[i++];
+            if (s == null)
+                return "?";
+            if (typeof s === "string")
+                return "'" + s.replace(/'/g, "\\'") + "'";
+            return s;
+        });
         return this.queryAsync(sql, args, opts).then(function (rows) {
-            _this.log.debug(sql, args || "");
+            _this.log.debug(msg);
             return rows;
         }, function (err) {
-            _this.log.error(sql, args || "", err);
+            _this.log.error(msg, err);
             return Promise.reject(err);
         });
     };

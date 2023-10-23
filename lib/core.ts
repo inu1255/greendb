@@ -56,7 +56,11 @@ export interface IEngine {
 	quotes(key: string): string;
 	sqlval(v: any): string;
 	runSql(s: ISql): Promise<any>;
-	execSQL(sqls: Array<ISql | string> | ISql | string, args?: any[], ctx?: ExecSqlOptions): Promise<any>;
+	execSQL(
+		sqls: Array<ISql | string> | ISql | string,
+		args?: any[],
+		ctx?: ExecSqlOptions
+	): Promise<any>;
 	/** DDL需要 */
 	getTables(): Promise<Table[]>;
 	createTable(table: Table): string[];
@@ -265,7 +269,9 @@ export class SelectSql<T = any> extends SqlWhere<T> {
 		this._page = false;
 	}
 	get sql() {
-		return `select ${this._keys.join(",")} from ${this.quotes(this._table)}${this._where.toWhere()}${this._order}${this._limit}`;
+		return `select ${this._keys.join(",")} from ${this.quotes(
+			this._table
+		)}${this._where.toWhere()}${this._order}${this._limit}`;
 	}
 	/**
 	 * @param {String} [key]
@@ -353,7 +359,10 @@ export class DeleteSql<T = any> extends SqlWhere<T> {
 	}
 }
 
-export class InsertNotExist<T = any> extends Wherable(Tablable(Runnable(Base))) implements Promise<T> {
+export class InsertNotExist<T = any>
+	extends Wherable(Tablable(Runnable(Base)))
+	implements Promise<T>
+{
 	protected _id: boolean;
 	protected _data: any;
 	constructor(table: string, data: any) {
@@ -381,7 +390,10 @@ export class InsertNotExist<T = any> extends Wherable(Tablable(Runnable(Base))) 
 	}
 }
 
-export class InsertOrUpdate<T = any> extends Wherable(Tablable(Runnable(Base))) implements Promise<T> {
+export class InsertOrUpdate<T = any>
+	extends Wherable(Tablable(Runnable(Base)))
+	implements Promise<T>
+{
 	protected _id: boolean;
 	protected _insertData: any;
 	protected _updateData: any;
@@ -553,7 +565,11 @@ export interface Logger {
 export abstract class EngineConfig {}
 
 export abstract class Engine implements IEngine {
-	abstract execSQL(sqls: ISql | string | Array<ISql | string>, args?: Array<any>, opts?: ExecSqlOptions): Promise<any>;
+	abstract execSQL(
+		sqls: ISql | string | Array<ISql | string>,
+		args?: Array<any>,
+		opts?: ExecSqlOptions
+	): Promise<any>;
 	abstract withTransaction(fn: {(db: Engine): Promise<any>}): Promise<any>;
 	abstract end(): Promise<any>;
 	getTables(): Promise<Table[]> {
@@ -585,7 +601,9 @@ export abstract class Engine implements IEngine {
 						});
 					return db.execSQL(s.insertSql()).catch((e) => db.execSQL(s.updateSql()));
 				});
-			return Promise.reject(new Error("can not insert or update with out where Engine=" + this.constructor.name));
+			return Promise.reject(
+				new Error("can not insert or update with out where Engine=" + this.constructor.name)
+			);
 		}
 		if (s instanceof InsertNotExist) {
 			let s1 = s;
@@ -605,7 +623,7 @@ export abstract class Engine implements IEngine {
 		if (v == null) return "null";
 		if (typeof v === "number") return v.toString();
 		if (typeof v === "string") return `'${v.replace(/'/g, "''")}'`;
-		if(v instanceof Raw) return v.toString();
+		if (v instanceof Raw) return v.toString();
 		return `'${JSON.stringify(v).replace(/'/g, "''")}'`;
 	}
 	setLogger(log?: Logger) {
@@ -645,26 +663,39 @@ export abstract class ConnEngine extends Engine {
 	abstract queryAsync(sql: string, args?: Array<any>, opts?: ExecSqlOptions): Promise<any>;
 	private SingleSQL(sql: string, args?: Array<any>, opts?: ExecSqlOptions): Promise<any> {
 		if (opts.ignore) return this.queryAsync(sql, args, opts);
+		var i = 0;
+		var msg = sql.replace(/\?/g, function () {
+			let s = args[i++];
+			if (s == null) return "?";
+			if (typeof s === "string") return `'${s.replace(/'/g, "\\'")}'`;
+			return s;
+		});
 		return this.queryAsync(sql, args, opts).then(
 			(rows) => {
-				this.log.debug(sql, args || "");
+				this.log.debug(msg);
 				return rows;
 			},
 			(err) => {
-				this.log.error(sql, args || "", err);
+				this.log.error(msg, err);
 				return Promise.reject(err);
 			}
 		);
 	}
-	execSQL(sqls: ISql | string | Array<ISql | string>, args?: Array<any>, opts?: ExecSqlOptions): Promise<any> {
+	execSQL(
+		sqls: ISql | string | Array<ISql | string>,
+		args?: Array<any>,
+		opts?: ExecSqlOptions
+	): Promise<any> {
 		let db = this;
 		opts = opts || {};
 		args = args || [];
 		let ss = arr(sqls).filter((x) => x);
 		for (let s of ss) {
-			if (typeof s != "string" && !instanceOfSql(s)) throw new Error("execSQL params must be string or ISql");
+			if (typeof s != "string" && !instanceOfSql(s))
+				throw new Error("execSQL params must be string or ISql");
 		}
-		let autoTrans = opts.transaction == null ? sqls instanceof Array && sqls.length > 1 : opts.transaction;
+		let autoTrans =
+			opts.transaction == null ? sqls instanceof Array && sqls.length > 1 : opts.transaction;
 		let pms: Promise<any> = Promise.resolve();
 		if (autoTrans) pms = pms.then(() => db.beginTransaction());
 		let out = [];
@@ -728,7 +759,11 @@ export abstract class PoolEngine extends Engine {
 			)
 		);
 	}
-	execSQL(sqls: ISql | string | Array<ISql | string>, args?: Array<any>, opts?: ExecSqlOptions): Promise<any> {
+	execSQL(
+		sqls: ISql | string | Array<ISql | string>,
+		args?: Array<any>,
+		opts?: ExecSqlOptions
+	): Promise<any> {
 		return this.withConn((conn) => {
 			conn.setLogger(this.log);
 			return conn.execSQL(sqls, args, opts);

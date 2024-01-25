@@ -49,11 +49,9 @@ export declare class Raw implements ISql, CloneAble {
     ["constructor"]: typeof Raw;
     protected _sql: string;
     protected _args: any[];
-    ignore_log: boolean;
     constructor(sql?: string, args?: any);
     get sql(): string;
     get args(): any[];
-    quiet(): this;
     /**
      * 用args替换sql中的?并返回字符串
      * @returns {string}
@@ -115,6 +113,8 @@ declare const Sql_base: {
         [Symbol.toStringTag]: string;
         $$pms: Promise<any>;
         _e: IEngine;
+        ignore_log?: boolean;
+        quiet(): any;
         engine(e: IEngine): any;
         run(): Promise<any>;
         $pms(): Promise<any>;
@@ -215,6 +215,8 @@ declare const InsertNotExist_base: {
         [Symbol.toStringTag]: string;
         $$pms: Promise<any>;
         _e: IEngine;
+        ignore_log?: boolean;
+        quiet(): any;
         engine(e: IEngine): any;
         run(): Promise<any>;
         $pms(): Promise<any>;
@@ -253,6 +255,8 @@ declare const InsertOrUpdate_base: {
         [Symbol.toStringTag]: string;
         $$pms: Promise<any>;
         _e: IEngine;
+        ignore_log?: boolean;
+        quiet(): any;
         engine(e: IEngine): any;
         run(): Promise<any>;
         $pms(): Promise<any>;

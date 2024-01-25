@@ -62,10 +62,6 @@ var Raw = /** @class */ (function () {
         enumerable: false,
         configurable: true
     });
-    Raw.prototype.quiet = function () {
-        this.ignore_log = true;
-        return this;
-    };
     /**
      * 用args替换sql中的?并返回字符串
      * @returns {string}

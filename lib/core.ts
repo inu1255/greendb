@@ -71,7 +71,6 @@ export class Raw implements ISql, CloneAble {
 	["constructor"]: typeof Raw;
 	protected _sql: string;
 	protected _args: any[];
-	ignore_log: boolean;
 	constructor(sql?: string, args?: any) {
 		this._sql = sql || "";
 		this._args = arr(args);
@@ -81,10 +80,6 @@ export class Raw implements ISql, CloneAble {
 	}
 	get args() {
 		return this._args;
-	}
-	quiet() {
-		this.ignore_log = true;
-		return this;
 	}
 	/**
 	 * 用args替换sql中的?并返回字符串

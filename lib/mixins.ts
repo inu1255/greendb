@@ -11,8 +11,13 @@ export function Runnable<B extends Constructor<{}>>(Base: B) {
 		[Symbol.toStringTag]: string;
 		$$pms: Promise<any>;
 		_e: IEngine;
+		ignore_log?: boolean;
 		constructor(...args: any[]) {
 			super(...args);
+		}
+		quiet() {
+			this.ignore_log = true;
+			return this;
 		}
 		engine(e: IEngine) {
 			this._e = e;

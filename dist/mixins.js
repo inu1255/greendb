@@ -31,6 +31,10 @@ function Runnable(Base) {
             }
             return _super.apply(this, args) || this;
         }
+        class_1.prototype.quiet = function () {
+            this.ignore_log = true;
+            return this;
+        };
         class_1.prototype.engine = function (e) {
             this._e = e;
             return this;

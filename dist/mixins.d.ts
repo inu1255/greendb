@@ -8,6 +8,8 @@ export declare function Runnable<B extends Constructor<{}>>(Base: B): {
         [Symbol.toStringTag]: string;
         $$pms: Promise<any>;
         _e: IEngine;
+        ignore_log?: boolean;
+        quiet(): any;
         engine(e: IEngine): any;
         run(): Promise<any>;
         $pms(): Promise<any>;

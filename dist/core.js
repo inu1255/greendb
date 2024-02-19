@@ -612,7 +612,10 @@ var Engine = /** @class */ (function () {
     Engine.prototype.runSql = function (s) {
         var _this = this;
         if (s instanceof SelectSql && s.isPage())
-            return this.execSQL([s, s.clone().count()], [], { transaction: false }).then(function (rows) {
+            return this.execSQL([s, s.clone().count()], [], {
+                transaction: false,
+                ignore: s.ignore_log,
+            }).then(function (rows) {
                 return { list: rows[0], total: rows[1] };
             });
         if (s instanceof InsertOrUpdate) {
@@ -620,12 +623,14 @@ var Engine = /** @class */ (function () {
                 return this.withTransaction(function (db) {
                     var select = s.selectSql();
                     if (select)
-                        return db.execSQL(select).then(function (one) {
+                        return db.execSQL(select, null, { ignore: s.ignore_log }).then(function (one) {
                             if (one)
-                                return db.execSQL(s.updateSql());
-                            return db.execSQL(s.insertSql());
+                                return db.execSQL(s.updateSql(), null, { ignore: s.ignore_log });
+                            return db.execSQL(s.insertSql(), null, { ignore: s.ignore_log });
                         });
-                    return db.execSQL(s.insertSql()).catch(function (e) { return db.execSQL(s.updateSql()); });
+                    return db
+                        .execSQL(s.insertSql(), null, { ignore: s.ignore_log })
+                        .catch(function (e) { return db.execSQL(s.updateSql(), null, { ignore: s.ignore_log }); });
                 });
             return Promise.reject(new Error("can not insert or update with out where Engine=" + this.constructor.name));
         }

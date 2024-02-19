@@ -582,7 +582,10 @@ export abstract class Engine implements IEngine {
 	}
 	runSql(s: Sql): Promise<Paged<any>> {
 		if (s instanceof SelectSql && s.isPage())
-			return this.execSQL([s, s.clone().count()], [], {transaction: false}).then((rows) => {
+			return this.execSQL([s, s.clone().count()], [], {
+				transaction: false,
+				ignore: s.ignore_log,
+			}).then((rows) => {
 				return {list: rows[0], total: rows[1]};
 			});
 		if (s instanceof InsertOrUpdate) {
@@ -590,11 +593,13 @@ export abstract class Engine implements IEngine {
 				return this.withTransaction(function (db) {
 					var select = s.selectSql();
 					if (select)
-						return db.execSQL(select).then((one) => {
-							if (one) return db.execSQL(s.updateSql());
-							return db.execSQL(s.insertSql());
+						return db.execSQL(select, null, {ignore: s.ignore_log}).then((one) => {
+							if (one) return db.execSQL(s.updateSql(), null, {ignore: s.ignore_log});
+							return db.execSQL(s.insertSql(), null, {ignore: s.ignore_log});
 						});
-					return db.execSQL(s.insertSql()).catch((e) => db.execSQL(s.updateSql()));
+					return db
+						.execSQL(s.insertSql(), null, {ignore: s.ignore_log})
+						.catch((e) => db.execSQL(s.updateSql(), null, {ignore: s.ignore_log}));
 				});
 			return Promise.reject(
 				new Error("can not insert or update with out where Engine=" + this.constructor.name)
